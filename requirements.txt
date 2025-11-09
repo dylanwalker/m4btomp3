@@ -1,0 +1,15 @@
+"""
+requirements.txt
+
+This project only requires standard Python libraries (json, subprocess, argparse, pathlib).
+No external Python packages are needed.
+
+However, the following system-level tools are required:
+- FFmpeg 4.0+  (includes ffprobe)
+- Python 3.7+
+
+Install FFmpeg:
+  - Windows: Download from https://ffmpeg.org/download.html or use: choco install ffmpeg
+  - macOS: brew install ffmpeg
+  - Linux: sudo apt-get install ffmpeg
+"""
