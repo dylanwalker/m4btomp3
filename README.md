@@ -52,6 +52,15 @@ Then verify:
 m4btomp3 --help
 ```
 
+**Note:** The setup script detects whether it's run with `sudo`:
+- **Without `sudo`**: Installs to `~/.local/bin/` (user-only)
+- **With `sudo`**: Installs to `/usr/local/bin/` (system-wide, available to all users and `sudo`)
+
+For system-wide installation that works with `sudo`:
+```bash
+sudo bash setup.sh
+```
+
 #### Windows (PowerShell)
 
 ```powershell
