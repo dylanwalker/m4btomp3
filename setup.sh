@@ -15,11 +15,6 @@ echo ""
 # Get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Make the main scripts executable
-echo "Making Python scripts executable..."
-chmod +x "$SCRIPT_DIR/m4btomp3.py"
-chmod +x "$SCRIPT_DIR/mp3tom4b.py"
-
 # Check if running with sudo
 if [ "$EUID" -eq 0 ]; then
     # System-wide installation (running as root)
