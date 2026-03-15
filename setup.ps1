@@ -1,22 +1,22 @@
-# Setup script to make m4btomp3 callable from anywhere in Windows PowerShell
-# Run this script in PowerShell to configure m4btomp3 for command-line access
+# Setup script to make m4btomp3 and mp3tom4b callable from anywhere in Windows PowerShell
+# Run this script in PowerShell to configure both audiobook tools for command-line access
 
 param(
     [switch]$System
 )
 
-Write-Host "m4btomp3 Setup for Windows PowerShell" -ForegroundColor Cyan
+Write-Host "Audiobook Tools Setup for Windows PowerShell" -ForegroundColor Cyan
 Write-Host ""
 
 # Get the directory where this script is located
 $ScriptDir = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 
 if ($System) {
-    Write-Host "Setting up m4btomp3 for all users (system-wide)..."
+    Write-Host "Setting up audiobook tools for all users (system-wide)..."
     Write-Host "This requires administrator privileges"
 }
 else {
-    Write-Host "Setting up m4btomp3 for current user"
+    Write-Host "Setting up audiobook tools for current user"
 }
 
 # Determine where to place the batch wrapper
@@ -40,23 +40,41 @@ if (-not (Test-Path $TargetDir)) {
     New-Item -ItemType Directory -Path $TargetDir -Force | Out-Null
 }
 
-# Copy the main script
-Write-Host "Copying m4btomp3.py to $TargetDir..."
-Copy-Item (Join-Path $ScriptDir "m4btomp3.py") -Destination $TargetDir -Force
+# Copy the main scripts
+$Tools = @(
+    @{
+        Script = "m4btomp3.py"
+        Command = "m4btomp3.cmd"
+        Description = "Convert m4b audiobooks to MP3 chapters"
+    },
+    @{
+        Script = "mp3tom4b.py"
+        Command = "mp3tom4b.cmd"
+        Description = "Convert a folder of MP3 chapters into an M4B audiobook"
+    }
+)
 
-# Create batch wrapper
-$BatchContent = @"
+foreach ($Tool in $Tools) {
+    $ScriptSource = Join-Path $ScriptDir $Tool.Script
+    $ScriptDestination = Join-Path $TargetDir $Tool.Script
+
+    Write-Host "Copying $($Tool.Script) to $TargetDir..."
+    Copy-Item $ScriptSource -Destination $ScriptDestination -Force
+
+    $BatchContent = @"
 @echo off
-REM m4btomp3 - Convert m4b audiobooks to MP3 chapters
+REM $($Tool.Command) - $($Tool.Description)
 REM This batch file calls the Python script
 
-python "%~dp0m4btomp3.py" %*
+python "%~dp0$($Tool.Script)" %*
 "@
 
-$BatchPath = Join-Path $TargetDir "m4btomp3.cmd"
-Set-Content -Path $BatchPath -Value $BatchContent -Encoding ASCII
+    $BatchPath = Join-Path $TargetDir $Tool.Command
+    Set-Content -Path $BatchPath -Value $BatchContent -Encoding ASCII
 
-Write-Host "✓ Batch wrapper created: $BatchPath"
+    Write-Host "✓ Batch wrapper created: $BatchPath"
+}
+
 Write-Host ""
 
 # Add to PATH
@@ -88,13 +106,17 @@ else {
 Write-Host ""
 Write-Host "✓ Setup complete!" -ForegroundColor Green
 Write-Host ""
-Write-Host "You can now call m4btomp3 from any command prompt:"
+Write-Host "You can now call these commands from any command prompt:"
 Write-Host "  m4btomp3 <input_file> <output_folder>"
 Write-Host "  m4btomp3 --help"
+Write-Host "  mp3tom4b <input_folder> --output <output_file>"
+Write-Host "  mp3tom4b --help"
 Write-Host ""
 Write-Host "Examples:"
 Write-Host "  m4btomp3 audiobook.m4b output_folder"
 Write-Host "  m4btomp3 book.m4b chapters/ --separator `"-`""
+Write-Host "  mp3tom4b chapters\ --output audiobook.m4b"
+Write-Host "  mp3tom4b chapters\ --cover cover.png --bitrate 96k"
 Write-Host ""
 
 if (-not $System) {

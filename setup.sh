@@ -1,6 +1,6 @@
 #!/bin/bash
-# Setup script to make m4btomp3 callable from anywhere in bash
-# This script sets up m4btomp3 for Unix-like systems (Linux, macOS)
+# Setup script to make m4btomp3 and mp3tom4b callable from anywhere in bash
+# This script sets up both audiobook conversion tools for Unix-like systems
 
 set -e
 
@@ -9,15 +9,16 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}m4btomp3 Setup for Bash${NC}"
+echo -e "${BLUE}Audiobook Tools Setup for Bash${NC}"
 echo ""
 
 # Get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Make the main script executable
-echo "Making m4btomp3.py executable..."
+# Make the main scripts executable
+echo "Making Python scripts executable..."
 chmod +x "$SCRIPT_DIR/m4btomp3.py"
+chmod +x "$SCRIPT_DIR/mp3tom4b.py"
 
 # Check if running with sudo
 if [ "$EUID" -eq 0 ]; then
@@ -25,7 +26,9 @@ if [ "$EUID" -eq 0 ]; then
     INSTALL_DIR="/usr/local/bin"
     echo "Installing to system PATH: $INSTALL_DIR"
     cp "$SCRIPT_DIR/m4btomp3.py" "$INSTALL_DIR/m4btomp3"
+    cp "$SCRIPT_DIR/mp3tom4b.py" "$INSTALL_DIR/mp3tom4b"
     chmod +x "$INSTALL_DIR/m4btomp3"
+    chmod +x "$INSTALL_DIR/mp3tom4b"
     echo -e "${GREEN}✓ System-wide installation complete!${NC}"
 else
     # User-only installation
@@ -33,7 +36,9 @@ else
     echo "Installing to user PATH: $INSTALL_DIR"
     mkdir -p "$INSTALL_DIR"
     cp "$SCRIPT_DIR/m4btomp3.py" "$INSTALL_DIR/m4btomp3"
+    cp "$SCRIPT_DIR/mp3tom4b.py" "$INSTALL_DIR/mp3tom4b"
     chmod +x "$INSTALL_DIR/m4btomp3"
+    chmod +x "$INSTALL_DIR/mp3tom4b"
     
     # Add ~/.local/bin to PATH if not already there
     if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
@@ -58,10 +63,14 @@ else
 fi
 
 echo ""
-echo "You can now call m4btomp3 from anywhere:"
+echo "You can now call these commands from anywhere:"
 echo "  m4btomp3 <input_file> <output_folder>"
 echo "  m4btomp3 --help"
+echo "  mp3tom4b <input_folder> --output <output_file>"
+echo "  mp3tom4b --help"
 echo ""
 echo "Examples:"
 echo "  m4btomp3 audiobook.m4b output_folder"
 echo "  m4btomp3 book.m4b chapters/ --separator \"-\""
+echo "  mp3tom4b chapters/ --output audiobook.m4b"
+echo "  mp3tom4b chapters/ --cover cover.png --bitrate 96k"
